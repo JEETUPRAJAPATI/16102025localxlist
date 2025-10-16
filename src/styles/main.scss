@@ -1,0 +1,20 @@
+// Step 1: Use Bootstrap and theme variables
+@use "bootstrap" as *;
+
+@use 'theme-dark' as *;
+@use 'theme-light' as *;
+
+// Step 4: Styles
+.container {
+  max-width: calc(100vw * 0.8);
+}
+
+@media screen and (max-width: 768px) {
+  .container {
+    max-width: calc(100vw * 0.96);
+  }
+}
+
+.tox .tox-edit-area::before {
+  border-radius: 10px !important;
+}
