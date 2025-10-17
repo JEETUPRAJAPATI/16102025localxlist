@@ -40,14 +40,18 @@ const PostView = ({
   // Function Declaration
   //:========================================
   const handleCopy = (text) => {
-    navigator.clipboard
-      .writeText(text)
-      .then(() => {
-        alert("Copied This text...:" + text);
-      })
-      .catch((err) => {
-        console.error("Failed to copy: ", err);
-      });
+    if (typeof window !== 'undefined' && navigator.clipboard) {
+      navigator.clipboard
+        .writeText(text)
+        .then(() => {
+          alert("Copied This text...:" + text);
+        })
+        .catch((err) => {
+          console.error("Failed to copy: ", err);
+        });
+    } else {
+      console.warn('Clipboard API not available');
+    }
   };
 
   // Toggle between relative time and actual date

@@ -163,8 +163,8 @@ const PostPreview = ({ formData, postImages }) => {
         email={email}
         phone={phone}
         images={newPostImages}
-        formattedDate={new Date()?.toISOString() || "N/A"}
-        relativeTime={new Date()?.toLocaleDateString() || "N/A"}
+        formattedDate="Preview - Just now"
+        relativeTime="Preview - Just now"
         tableData={
           <Table bordered hover>
             <tbody>

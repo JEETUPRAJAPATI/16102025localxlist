@@ -107,8 +107,27 @@ const UserCreatePost = () => {
     location: "",
     images: [],
   };
-  // Check Session Storage Post Form Any Changes
-  const postFormStorage = JSON.parse(sessionStorage.getItem("postForm")) || {};
+  //:========================================
+  // States Declaration
+  //:========================================
+  const [mounted, setMounted] = useState(false);
+  const [timeLeft, setTimeLeft] = useState(0); // Countdown duration
+  const [isCooldown, setIsCooldown] = useState(true); // Button cooldown state
+
+  const [step, setStep] = useState(0); // Manages which step we are on
+  const [postImages, setPostImages] = useState([]);
+  const [formData, setFormData] = useState(initialFormData);
+
+  // Check Session Storage Post Form Any Changes (client-side only)
+  const postFormStorage = useMemo(() => {
+    if (!mounted || typeof window === 'undefined') return {};
+    try {
+      return JSON.parse(sessionStorage.getItem("postForm")) || {};
+    } catch {
+      return {};
+    }
+  }, [mounted]);
+
   const updatedFormData = useMemo(
     () => ({
       ...initialFormData,
@@ -118,27 +137,24 @@ const UserCreatePost = () => {
   );
 
   //:========================================
-  // States Declaration
-  //:========================================
-  const [timeLeft, setTimeLeft] = useState(0); // Countdown duration
-  const [isCooldown, setIsCooldown] = useState(true); // Button cooldown state
-
-  const [step, setStep] = useState(0); // Manages which step we are on
-  const [postImages, setPostImages] = useState([]);
-  const [formData, setFormData] = useState(initialFormData);
-
-  //:========================================
   // Function Declaration
   //:========================================
   const handleSelect = useCallback((type, value) => {
     setFormData((prev) => ({ ...prev, [type]: value }));
-    sessionStorage.setItem(
-      "postForm",
-      JSON.stringify({
-        ...JSON.parse(sessionStorage.getItem("postForm") || "{}"),
-        [type]: value,
-      })
-    );
+    // Only access sessionStorage on client-side
+    if (typeof window !== 'undefined' && window.sessionStorage) {
+      try {
+        sessionStorage.setItem(
+          "postForm",
+          JSON.stringify({
+            ...JSON.parse(sessionStorage.getItem("postForm") || "{}"),
+            [type]: value,
+          })
+        );
+      } catch (error) {
+        console.warn('Failed to save to sessionStorage:', error);
+      }
+    }
   }, []);
 
   const goToNextStep = useCallback(() => {
@@ -243,12 +259,19 @@ const UserCreatePost = () => {
   //:========================================
   // Effect Load Declaration
   //:========================================
+  // Prevent hydration mismatch
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   useEffect(() => {
     fetchCommonAPI();
   }, [fetchCommonAPI]);
 
   useEffect(() => {
-    // Display remaining time from localStorage
+    // Display remaining time from localStorage (client-side only)
+    if (!mounted || typeof window === 'undefined') return;
+    
     const updateCountdown = () => {
       const now = Date.now();
       const savedTime = localStorage.getItem("countdownEnd");
@@ -259,7 +282,9 @@ const UserCreatePost = () => {
         );
         setTimeLeft(remainingTime);
         setIsCooldown(remainingTime > 0);
-        if (remainingTime < 0) sessionStorage.removeItem("postForm");
+        if (remainingTime < 0 && window.sessionStorage) {
+          sessionStorage.removeItem("postForm");
+        }
       } else {
         setTimeLeft(0);
         setIsCooldown(false);
@@ -420,7 +445,7 @@ const UserCreatePost = () => {
       setPostImages([]);
       setFormData(initialFormData);
     };
-  }, [actionType]);
+  }, [actionType, mounted, updatedFormData]);
 
   return (
     <>

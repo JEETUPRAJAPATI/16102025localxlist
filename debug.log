@@ -25967,3 +25967,12 @@
 [2025-09-27T07:46:56.833Z] INFO: Request: GET /415.shtml
 [2025-09-27T07:50:27.459Z] INFO: Request: GET /ebulus12103760
 [2025-09-27T07:51:04.722Z] INFO: Request: GET /pcmypage?callback=product/review/okateko-uisuki
+[2025-10-17T08:25:54.971Z] INFO: === Application Starting ===
+[2025-10-17T08:25:54.972Z] INFO: NODE_ENV: production
+[2025-10-17T08:25:54.972Z] INFO: NEXT_PUBLIC_NODE_ENV: production
+[2025-10-17T08:25:54.972Z] INFO: PORT: 3007
+[2025-10-17T08:25:54.973Z] INFO: Current directory: D:\bolt.new\Online
+[2025-10-17T08:25:54.973Z] INFO: Node version: v20.19.3
+[2025-10-17T08:25:54.973Z] INFO: Starting Next.js app with dev mode: false
+[2025-10-17T08:25:58.901Z] INFO: Next.js app prepared successfully
+[2025-10-17T08:25:58.906Z] INFO: > Server ready on http://0.0.0.0:3007

@@ -100,13 +100,27 @@ export const dynamicSort = (key, order = 'asc') => {
   };
 };
 
-// STORE THEME
+// STORE THEME (client-side only)
 export const setTheme = (theme) => {
-  localStorage.setItem('theme', JSON.stringify(theme));
+  if (typeof window !== 'undefined' && window.localStorage) {
+    try {
+      localStorage.setItem('theme', JSON.stringify(theme));
+    } catch (error) {
+      console.warn('Failed to save theme to localStorage:', error);
+    }
+  }
 };
-// GET THEME
+// GET THEME (client-side only)
 export const getTheme = () => {
-  return JSON.parse(localStorage.getItem('theme'));
+  if (typeof window !== 'undefined' && window.localStorage) {
+    try {
+      return JSON.parse(localStorage.getItem('theme'));
+    } catch (error) {
+      console.warn('Failed to get theme from localStorage:', error);
+      return null;
+    }
+  }
+  return null;
 };
 
 export const truncatedContent = (text, customLength = 100) => {
