@@ -1,6 +1,9 @@
+/* global performance */
 /**
  * Performance utilities for optimizing API calls and data handling
  */
+
+import React from 'react';
 
 // Request caching with TTL
 const cache = new Map();
@@ -152,21 +155,21 @@ export const preloadData = (apiFunction, ...args) => {
 /**
  * Optimize image loading
  */
-export const optimizeImage = (src, { width, height, quality = 75, format = 'webp' } = {}) => {
+export const optimizeImage = (src, { width, height, quality = 75 } = {}) => {
   if (!src) return src;
-  
   // If it's already an optimized URL, return as is
   if (src.includes('/_next/image') || src.includes('w_') || src.includes('q_')) {
     return src;
   }
-  
   // For Next.js image optimization
-  const params = new URLSearchParams();
-  if (width) params.set('w', width);
-  if (height) params.set('h', height);
-  if (quality) params.set('q', quality);
-  
-  return `/_next/image?url=${encodeURIComponent(src)}&${params.toString()}`;
+  if (typeof window !== 'undefined' && typeof window.URLSearchParams !== 'undefined') {
+    const params = new window.URLSearchParams();
+    if (width) params.set('w', width);
+    if (height) params.set('h', height);
+    if (quality) params.set('q', quality);
+    return `/_next/image?url=${encodeURIComponent(src)}&${params.toString()}`;
+  }
+  return src;
 };
 
 /**
@@ -190,12 +193,11 @@ export const getMemoryUsage = () => {
  */
 export const clearAllCaches = () => {
   cache.clear();
-  
   // Clear browser caches if available
-  if ('caches' in window) {
-    caches.keys().then(names => {
+  if (typeof window !== 'undefined' && 'caches' in window) {
+    window.caches.keys().then(names => {
       names.forEach(name => {
-        caches.delete(name);
+        window.caches.delete(name);
       });
     });
   }
@@ -205,16 +207,16 @@ export const clearAllCaches = () => {
  * Lazy load modules
  */
 export const lazyImport = (importFunction) => {
-  // Dynamic import to avoid React dependency in server-side code
-  return typeof window !== 'undefined' 
-    ? require('react').lazy(() => 
-        importFunction().catch(err => {
-          console.error('Module loading failed:', err);
-          // Return a fallback component
-          return { default: () => require('react').createElement('div', null, 'Loading failed') };
-        })
-      )
-    : () => null;
+  // Return a no-op on server
+  if (typeof window === 'undefined') return () => null;
+
+  // Use React.lazy with dynamic import in browser
+  return React.lazy(() =>
+    importFunction().catch(err => {
+      console.error('Module loading failed:', err);
+      return { default: () => React.createElement('div', null, 'Loading failed') };
+    })
+  );
 };
 
 export default {

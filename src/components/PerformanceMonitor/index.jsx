@@ -1,3 +1,6 @@
+
+/* global PerformanceObserver, performance */
+// The above line tells ESLint these browser globals are defined
 import { useEffect, useRef } from 'react';
 import { useRouter } from 'next/router';
 
@@ -6,6 +9,7 @@ const PerformanceMonitor = () => {
   const performanceDataRef = useRef({});
 
   useEffect(() => {
+    if (typeof window === 'undefined' || typeof PerformanceObserver === 'undefined') return;
     // Monitor Core Web Vitals
     const observePerformance = () => {
       // Largest Contentful Paint (LCP)
@@ -16,33 +20,28 @@ const PerformanceMonitor = () => {
           }
         }
       });
-
       try {
         observer.observe({ entryTypes: ['largest-contentful-paint'] });
-      } catch (e) {
+      } catch {
         // Fallback for browsers that don't support this
         console.warn('LCP monitoring not supported');
       }
 
       // First Input Delay (FID) and Cumulative Layout Shift (CLS)
-      if ('web-vital' in window) {
+      if (window && 'web-vital' in window) {
         import('web-vitals').then(({ getCLS, getFID, getFCP, getLCP, getTTFB }) => {
           getCLS((metric) => {
             performanceDataRef.current.cls = metric.value;
           });
-
           getFID((metric) => {
             performanceDataRef.current.fid = metric.value;
           });
-
           getFCP((metric) => {
             performanceDataRef.current.fcp = metric.value;
           });
-
           getLCP((metric) => {
             performanceDataRef.current.lcp = metric.value;
           });
-
           getTTFB((metric) => {
             performanceDataRef.current.ttfb = metric.value;
           });
@@ -57,7 +56,7 @@ const PerformanceMonitor = () => {
       }
 
       // Memory usage monitoring
-      if ('memory' in performance) {
+      if (performance && 'memory' in performance) {
         performanceDataRef.current.memory = {
           used: performance.memory.usedJSHeapSize,
           total: performance.memory.totalJSHeapSize,
@@ -66,18 +65,18 @@ const PerformanceMonitor = () => {
       }
 
       // Resource timing
-      const resources = performance.getEntriesByType('resource');
-      const slowResources = resources.filter(resource => resource.duration > 1000);
-      if (slowResources.length > 0) {
-        performanceDataRef.current.slowResources = slowResources.map(r => ({
-          name: r.name,
-          duration: r.duration,
-          size: r.transferSize || 0
-        }));
+      if (performance && performance.getEntriesByType) {
+        const resources = performance.getEntriesByType('resource');
+        const slowResources = resources.filter(resource => resource.duration > 1000);
+        if (slowResources.length > 0) {
+          performanceDataRef.current.slowResources = slowResources.map(r => ({
+            name: r.name,
+            duration: r.duration,
+            size: r.transferSize || 0
+          }));
+        }
       }
     };
-
-    // Run performance monitoring
     observePerformance();
 
     // Monitor route changes for performance
@@ -89,7 +88,6 @@ const PerformanceMonitor = () => {
       if (performanceDataRef.current.routeChangeStart) {
         const duration = Date.now() - performanceDataRef.current.routeChangeStart;
         performanceDataRef.current.routeChangeDuration = duration;
-        
         // Log performance data in development
         if (process.env.NODE_ENV === 'development' && duration > 2000) {
           console.warn(`Slow route change detected: ${duration}ms`);
