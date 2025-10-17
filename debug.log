@@ -25976,3 +25976,21 @@
 [2025-10-17T08:25:54.973Z] INFO: Starting Next.js app with dev mode: false
 [2025-10-17T08:25:58.901Z] INFO: Next.js app prepared successfully
 [2025-10-17T08:25:58.906Z] INFO: > Server ready on http://0.0.0.0:3007
+[2025-10-17T09:40:13.483Z] INFO: === Application Starting ===
+[2025-10-17T09:40:13.648Z] INFO: NODE_ENV: production
+[2025-10-17T09:40:13.649Z] INFO: NEXT_PUBLIC_NODE_ENV: production
+[2025-10-17T09:40:13.649Z] INFO: PORT: 3007
+[2025-10-17T09:40:13.649Z] INFO: Current directory: D:\bolt.new\Online
+[2025-10-17T09:40:13.649Z] INFO: Node version: v20.19.3
+[2025-10-17T09:40:13.649Z] INFO: Starting Next.js app with dev mode: false
+[2025-10-17T09:40:21.690Z] INFO: Next.js app prepared successfully
+[2025-10-17T09:40:21.809Z] INFO: > Server ready on http://0.0.0.0:3007
+[2025-10-17T09:41:18.087Z] INFO: === Application Starting ===
+[2025-10-17T09:41:18.088Z] INFO: NODE_ENV: production
+[2025-10-17T09:41:18.089Z] INFO: NEXT_PUBLIC_NODE_ENV: production
+[2025-10-17T09:41:18.089Z] INFO: PORT: 3007
+[2025-10-17T09:41:18.089Z] INFO: Current directory: D:\bolt.new\Online
+[2025-10-17T09:41:18.089Z] INFO: Node version: v20.19.3
+[2025-10-17T09:41:18.089Z] INFO: Starting Next.js app with dev mode: false
+[2025-10-17T09:41:19.009Z] INFO: Next.js app prepared successfully
+[2025-10-17T09:41:19.013Z] INFO: > Server ready on http://0.0.0.0:3007
