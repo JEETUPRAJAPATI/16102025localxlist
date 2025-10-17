@@ -11,6 +11,19 @@ import '@/styles/global.scss';
 
 import { GoogleOAuthProvider } from '@react-oauth/google';
 
+// Performance components - lazy loaded to prevent blocking initial render
+import dynamic from 'next/dynamic';
+
+const PerformanceMonitor = dynamic(
+  () => import('@/components/PerformanceMonitor'),
+  { ssr: false }
+);
+
+const PerformanceOptimizer = dynamic(
+  () => import('@/components/PerformanceOptimizer'),
+  { ssr: false }
+);
+
 const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
 
 
@@ -21,12 +34,18 @@ function MyApp({ Component, ...rest }) {
       <ThemeProvider>
         <Provider store={store}>
           <ErrorBoundary fallback={<ErrorPage />}>
-            <Suspense fallback={<div>Loading...</div>}>
-              <Head>
-                <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-              </Head>
-              <Component {...props.pageProps} />
-            </Suspense>
+            <PerformanceOptimizer>
+              <Suspense fallback={<div>Loading...</div>}>
+                <Head>
+                  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                  <meta name="theme-color" content="#000000" />
+                  <link rel="preconnect" href="https://fonts.googleapis.com" />
+                  <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
+                </Head>
+                <PerformanceMonitor />
+                <Component {...props.pageProps} />
+              </Suspense>
+            </PerformanceOptimizer>
           </ErrorBoundary>
         </Provider>
       </ThemeProvider>

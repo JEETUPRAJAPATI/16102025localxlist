@@ -20,6 +20,7 @@
     "axios": "^1.8.4",
     "bootstrap": "^5.3.5",
     "cookie": "^1.0.2",
+    "critters": "^0.0.23",
     "croppie": "^2.6.5",
     "cross-fetch": "^4.1.0",
     "dompurify": "^3.2.4",
@@ -41,6 +42,7 @@
     "redux": "^5.0.1",
     "reselect": "^5.1.1",
     "sass": "^1.86.3",
+    "web-vitals": "^5.1.0",
     "yet-another-react-lightbox": "^3.21.9",
     "yup": "^1.6.1"
   },

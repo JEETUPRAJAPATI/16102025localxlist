@@ -1,0 +1,139 @@
+/* Performance-optimized CSS utilities */
+
+/* Critical above-the-fold optimizations */
+.above-fold {
+  contain: layout style paint;
+  will-change: auto;
+}
+
+/* GPU acceleration for smooth animations */
+.gpu-accelerated {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+/* Optimized loading states */
+.loading-placeholder {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Optimized image containers */
+.image-container {
+  position: relative;
+  overflow: hidden;
+  background-color: #f8f9fa;
+}
+
+.image-container img {
+  transition: opacity 0.3s ease;
+  will-change: opacity;
+}
+
+.image-container img[loading="lazy"] {
+  opacity: 0;
+}
+
+.image-container img[loading="lazy"].loaded {
+  opacity: 1;
+}
+
+/* Layout shift prevention */
+.prevent-layout-shift {
+  contain: layout;
+  min-height: 1px;
+}
+
+/* Optimized scroll containers */
+.scroll-container {
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+  overscroll-behavior: contain;
+}
+
+/* Memory-efficient animations */
+@media (prefers-reduced-motion: no-preference) {
+  .smooth-transition {
+    transition: transform 0.2s ease-out, opacity 0.2s ease-out;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .smooth-transition {
+    transition: none;
+  }
+}
+
+/* Critical performance utilities */
+.contain-strict {
+  contain: strict;
+}
+
+.contain-layout {
+  contain: layout;
+}
+
+.contain-style {
+  contain: style;
+}
+
+.contain-paint {
+  contain: paint;
+}
+
+/* Optimized visibility utilities */
+.visually-hidden {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+/* Performance-critical responsive utilities */
+@media (max-width: 576px) {
+  .mobile-optimized {
+    font-size: 14px;
+    line-height: 1.4;
+  }
+}
+
+@media (min-width: 768px) {
+  .desktop-optimized {
+    font-size: 16px;
+    line-height: 1.6;
+  }
+}
+
+/* Lazy loading improvements */
+.lazy-load-wrapper {
+  min-height: 200px;
+  background: #f8f9fa;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lazy-load-wrapper.loaded {
+  min-height: auto;
+  background: transparent;
+}
+
+/* Critical path optimization */
+.critical-path {
+  font-display: swap;
+  text-rendering: optimizeSpeed;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}

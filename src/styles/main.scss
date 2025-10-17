@@ -4,6 +4,9 @@
 @use 'theme-dark' as *;
 @use 'theme-light' as *;
 
+// Performance optimizations
+@import 'performance';
+
 // Step 4: Styles
 .container {
   max-width: calc(100vw * 0.8);

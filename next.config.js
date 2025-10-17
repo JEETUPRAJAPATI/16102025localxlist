@@ -1,97 +1,67 @@
-/*global require*/
-/*eslint no-undef: "error"*/
-const { ROUTES } = require('./src/utils/constant');
+﻿const { ROUTES } = require('./src/utils/constant');
 
-const withBundleAnalyzer = require('@next/bundle-analyzer')({
-    enabled: process.env.ANALYZE === 'true',
-});
+module.exports = {
+    // Performance Optimizations
+    reactStrictMode: false, // Keep as requested
+    compress: true,
+    poweredByHeader: false,
+    // swcMinify is enabled by default in Next.js 15+
+    
+    // Experimental features for better performance
+    experimental: {
+        // optimizeCss: true, // Temporarily disabled - can cause issues in development
+        scrollRestoration: true, // Better scroll behavior
+        optimizePackageImports: [
+            'react-bootstrap',
+            '@fortawesome/react-fontawesome',
+            '@fortawesome/free-solid-svg-icons',
+            'react-html-parser'
+        ],
+    },
 
-module.exports = withBundleAnalyzer({
+    // URL Rewrites
     async rewrites() {
         return [
             {
                 source: ROUTES.userDashboard,
                 destination: ROUTES.userDashboardMain,
-            },
-            {
-                source: '/sitemap-pages.xml',
-                destination: '/sitemap/posts/static-pages',
-            },
-            {
-                source: '/sitemap-posts-:page.xml',
-                destination: '/sitemap/posts/:page',
-            },
-            {
-                source: '/sitemap-categories.xml',
-                destination: '/sitemap/posts/categories',
-            },
-            {
-                source: '/sitemap-partners.xml',
-                destination: '/sitemap/posts/partners',
-            },
+            }
         ];
     },
-    // Standard configuration
-    productionBrowserSourceMaps: false,
-    compress: true,
-    // Experimental features (keep only valid ones)
-    experimental: {
-        optimizePackageImports: [
-            'react-bootstrap',
-            'react-google-recaptcha',
-            'react-player',
-            'yet-another-react-lightbox',
-            '@tinymce/tinymce-react'
-        ],
-        // Remove modularizeImports as it's now handled by optimizePackageImports
-    },
 
-    webpack: (config, { isServer, dev }) => {
-        console.log('Environment:', {
-            NODE_ENV: process.env.NODE_ENV,
-            isServer,
-            isDev: dev
-        });
-
-        // Only optimize in production
-        config.optimization = {
-            ...config.optimization,
-            splitChunks: {
-                chunks: 'async',
-                minSize: 20000, // 20KB minimum chunk size
-                maxSize: 244 * 1024, // 244KB maximum chunk size
-                minChunks: 1,
-                maxAsyncRequests: 30,
-                maxInitialRequests: 30,
-                automaticNameDelimiter: '~',
+    // Advanced webpack configuration for performance
+    webpack: (config, { buildId, dev, isServer, defaultLoaders, webpack }) => {
+        // Production optimizations
+        if (!dev) {
+            // Enable tree shaking
+            config.optimization.usedExports = true;
+            config.optimization.sideEffects = false;
+            
+            // Advanced code splitting
+            config.optimization.splitChunks = {
+                chunks: 'all',
                 cacheGroups: {
-                    vendors: {
+                    // Vendor chunk for stable libraries
+                    vendor: {
                         test: /[\\/]node_modules[\\/]/,
-                        priority: -10,
-                        reuseExistingChunk: true,
-                        name(module) {
-                            const match = module.context.match(/[\\/]node_modules[\\/](.*?)([\\/]|$)/);
-                            if (!match) return 'vendor.unknown';
-                            const packageName = match[1];
-                            // Group smaller utilities together to reduce chunk count
-                            if (['axios', 'js-cookie', 'query-string', 'formik', 'yup', 'dompurify', 'html-react-parser'].includes(packageName)) {
-                                return 'vendor.utils';
-                            }
-                            return `vendor.${packageName.replace('@', '')}`;
-                        },
-                    },
-                    // Core React and Redux
-                    reactCore: {
-                        test: /[\\/]node_modules[\\/](react|react-dom|react-redux|redux|@reduxjs\/toolkit|next-redux-wrapper|redux-logger|reselect|scheduler)[\\/]/,
-                        name: 'react-core',
+                        name: 'vendors',
                         chunks: 'all',
                         priority: 20,
+                        reuseExistingChunk: true,
                     },
-                    bootstrap: {
-                        test: /[\\/]node_modules[\\/]bootstrap[\\/]/,
-                        name: 'bootstrap',
+                    // React and React-DOM
+                    react: {
+                        test: /[\\/]node_modules[\\/](react|react-dom)[\\/]/,
+                        name: 'react',
                         chunks: 'all',
-                        priority: 12,
+                        priority: 30,
+                    },
+                    // Redux and related libraries
+                    redux: {
+                        test: /[\\/]node_modules[\\/](react-redux|@reduxjs\/toolkit|redux)[\\/]/,
+                        name: 'redux',
+                        chunks: 'all',
+                        priority: 25,
                     },
                     // React Bootstrap
                     reactBootstrap: {
@@ -131,12 +101,13 @@ module.exports = withBundleAnalyzer({
                         reuseExistingChunk: true,
                     }
                 }
-            }
-        };
+            };
+        }
 
         return config;
     },
-    // SCSS configuration
+
+    // SCSS configuration for performance
     sassOptions: {
         quietDeps: true,
         logger: {
@@ -147,15 +118,97 @@ module.exports = withBundleAnalyzer({
         },
         includePaths: ['styles'],
     },
-    // Images configuration
+
+    // Enhanced image optimization
     images: {
         domains: ["localhost", "api.localxlist.net", "apilocalxlist.shrawantravels.com"],
-        unoptimized: true, // Disable image optimization for static export
         deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
         imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
-        minimumCacheTTL: 60,
-        formats: ['image/webp'],
+        minimumCacheTTL: 86400, // 24 hours cache
+        formats: ['image/webp', 'image/avif'], // Support modern formats
+        dangerouslyAllowSVG: true,
+        contentDispositionType: 'attachment',
+        contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
     },
-    // For React Bootstrap
-    transpilePackages: ['react-bootstrap'],
-});
+
+    // Compiler optimizations
+    compiler: {
+        removeConsole: process.env.NODE_ENV === 'production' ? {
+            exclude: ['error']
+        } : false,
+    },
+
+    // Package transpilation for better compatibility
+    transpilePackages: [
+        'react-bootstrap',
+        '@fortawesome/react-fontawesome',
+        '@fortawesome/free-solid-svg-icons',
+        'react-html-parser'
+    ],
+
+    // Output optimization (only for production builds)
+    // output: 'standalone', // Disabled for development mode
+
+    // Headers for performance and security
+    async headers() {
+        return [
+            {
+                source: '/(.*)',
+                headers: [
+                    {
+                        key: 'X-Frame-Options',
+                        value: 'DENY'
+                    },
+                    {
+                        key: 'X-Content-Type-Options',
+                        value: 'nosniff'
+                    },
+                    {
+                        key: 'Referrer-Policy',
+                        value: 'strict-origin-when-cross-origin'
+                    },
+                    {
+                        key: 'Cache-Control',
+                        value: 'public, max-age=31536000, immutable'
+                    }
+                ]
+            },
+            {
+                source: '/_next/static/(.*)',
+                headers: [
+                    {
+                        key: 'Cache-Control',
+                        value: 'public, max-age=31536000, immutable'
+                    }
+                ]
+            },
+            {
+                source: '/(.*).jpg',
+                headers: [
+                    {
+                        key: 'Cache-Control',
+                        value: 'public, max-age=86400'
+                    }
+                ]
+            },
+            {
+                source: '/(.*).png',
+                headers: [
+                    {
+                        key: 'Cache-Control',
+                        value: 'public, max-age=86400'
+                    }
+                ]
+            },
+            {
+                source: '/(.*).webp',
+                headers: [
+                    {
+                        key: 'Cache-Control',
+                        value: 'public, max-age=86400'
+                    }
+                ]
+            }
+        ];
+    }
+};
